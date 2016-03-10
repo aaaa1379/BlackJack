@@ -5,7 +5,6 @@ Created on Tue Mar 08 19:14:15 2016
 @author: Akii
 """
 
-#from random import shuffle
 import random
 
  
@@ -62,7 +61,7 @@ class Deck:
         
         
 class DealingMachine:
-    def __init__(self, deck, autoShuffle = 52, strategy = CardStrategy.HILO):
+    def __init__(self, deck, autoShuffle = 0, strategy = CardStrategy.HILO):
         self.shoe = []
         self.marker = 0
         self.counting = 0
@@ -72,6 +71,7 @@ class DealingMachine:
         for i in range(4 * deck):
             for x, y in Deck.LIST.items():
                 self.shoe.append(x)
+        self.shuffle()
         
     def shuffle(self):
         random.shuffle(self.shoe)
@@ -79,9 +79,15 @@ class DealingMachine:
         self.counting = 0
         
     def getCard(self):
+        if self.marker == len(self.shoe):
+            raise IndexError("no more cards in dealing machine.")
+
         card = self.shoe[self.marker]
-        self.counting += Deck.HILO[card]
         self.marker += 1
+        
+        # card counting        
+        if self.strategy == CardStrategy.HILO:
+            self.counting += Deck.HILO[card]
         
         # auto shuffle
         remain = self.getRemainValue()
