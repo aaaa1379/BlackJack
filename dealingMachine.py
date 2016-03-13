@@ -7,7 +7,6 @@ Created on Tue Mar 08 19:14:15 2016
 
 import random
 
- 
 class CardStrategy:
     """
     See More About Card Counting Strategy
@@ -90,16 +89,16 @@ class DealingMachine:
             self.counting += Deck.HILO[card]
         
         # auto shuffle
-        remain = self.getRemainValue()
+        remain = self.getRemain()
         if remain < self.autoShuffle:
             self.shuffle()
             
         return card
     
-    def getCountingValue(self):
+    def getCounting(self):
         return self.counting
         
-    def getRemainValue(self):
+    def getRemain(self):
         return len(self.shoe) - self.marker
         
     def getStrategy(self):
