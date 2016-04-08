@@ -62,8 +62,8 @@ class Deck:
 class DealingMachine:
     def __init__(self, deck, autoShuffle = 0, strategy = CardStrategy.HILO):
         self.shoe = []
-        self.marker = 0
-        self.counting = 0
+        self.marker = 0                    # the number of the cards
+        self.counting = 0                  # card counting
         self.autoShuffle = autoShuffle     # shuffle if cards remain this value
         self.strategy = strategy
         
