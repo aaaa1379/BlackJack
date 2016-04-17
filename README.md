@@ -1,5 +1,5 @@
 # Play
-## Compile and Exec in console
+Compile `game.py` and Exec in console
 ```python
 g = Game()
 g.gameInit()
