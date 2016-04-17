@@ -1,9 +1,17 @@
+# Play
+## Compile and Exec in console
+```python
+g = Game()
+g.gameInit()
+g.gameRound()
+```
+
 # Schedule
 ## Completed
 1. shuffling Machine
 1. Card Counting
 
-## 4/24(?)
+## 4/18 completed
 1. Rules
 1. Player
   - Decisions
@@ -32,7 +40,7 @@
 
 ## Resplit
 - Resplit to 4
-- Unlimited Resplit 
+- Unlimited Resplit
 
 ## Surrender
 - Early Surrender (rare)
