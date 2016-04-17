@@ -24,6 +24,7 @@ class GameState:
     LS = "Late Surrender"
     NS = "No Surrender"
     
+    
     ClassicRules = {
         DECK: 8,
         H17: H17,
@@ -33,12 +34,41 @@ class GameState:
         ES:  ES,
     }
     
-    def __init__(self, rules = ClassicRules):
-        self.rules = rules
-        
+    
+
+class Role:
+    PLAYER = "Player"
+    DEALER = "Dealer"
+
 class Decision:
     HIT = "Hit"
     STAND = "Stand"
     DOUBLE = "Double"
     SPLIT = "Split"
     SURRENDER = "Surrender"
+    
+    MAP = {
+        1: HIT,
+        2: STAND,
+        3: DOUBLE,
+        4: SPLIT,
+        5: SURRENDER,
+    }
+
+class EndStep:
+    # You Can Not Access This Decision
+    NEXT = "Continue!!!!"    
+    #  1.5x => BLACKJACK
+    #  1.0x => WIN
+    #  0.0x => DRAW
+    # -0.5x => SURRENDER
+    # -1.0x => BUST and LOST
+    BLACKJACK = "Blackjack"
+    SURRENDER = "Surrender"
+    BUST = "Bust"
+    STAND = "Stand"
+
+    WIN = "Win"
+    DRAW = "Draw"
+    LOSE = "Lose"
+    

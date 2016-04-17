@@ -16,19 +16,33 @@ class CardStrategy:
 
 
 class Deck:
-    Card_2 = 2
-    Card_3 = 3
-    Card_4 = 4
-    Card_5 = 5
-    Card_6 = 6
-    Card_7 = 7
-    Card_8 = 8
-    Card_9 = 9
-    Card_10= 10
-    Card_J = 11
-    Card_Q = 12
-    Card_K = 13
-    Card_A = 1
+    Card_2 = "Card_2"
+    Card_3 = "Card_3"
+    Card_4 = "Card_4"
+    Card_5 = "Card_5"
+    Card_6 = "Card_6"
+    Card_7 = "Card_7"
+    Card_8 = "Card_8"
+    Card_9 = "Card_9"
+    Card_10= "Card_10"
+    Card_J = "Card_J"
+    Card_Q = "Card_Q"
+    Card_K = "Card_K"
+    Card_A = "Card_A"
+    
+    VALUE = {Card_2: 2,
+            Card_3: 3,
+            Card_4: 4,
+            Card_5: 5,
+            Card_6: 6,
+            Card_7: 7,
+            Card_8: 8,
+            Card_9: 9,
+            Card_10: 10,
+            Card_J: 10,
+            Card_Q: 10,
+            Card_K: 10,
+            Card_A: 11}    
     
     LIST = {Card_2: Card_2,
             Card_3: Card_3,
@@ -78,14 +92,14 @@ class DealingMachine:
         self.counting = 0
         
     def getCard(self):
-        if self.marker == len(self.shoe):
+        if self.marker is len(self.shoe):
             raise IndexError("no more cards in dealing machine.")
 
         card = self.shoe[self.marker]
         self.marker += 1
         
         # card counting        
-        if self.strategy == CardStrategy.HILO:
+        if self.strategy is CardStrategy.HILO:
             self.counting += Deck.HILO[card]
         
         # auto shuffle
@@ -104,7 +118,9 @@ class DealingMachine:
     def getStrategy(self):
         return self.strategy
         
-        
+    # use for debug
+    def printCardList(self):
+        print self.shoe
         
         
         
