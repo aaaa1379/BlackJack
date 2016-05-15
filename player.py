@@ -9,6 +9,7 @@ from dealingMachine import Deck
 from gameRules import Role
 from gameRules import Decision
 from gameRules import EndStep
+import strategy
 
 class Player:
     def __init__(self, dm, rule, money):
@@ -18,27 +19,28 @@ class Player:
         self.money = money
 
     def initialDeal(self):
-        handCard = HandCard(self.dealingMachine, self.rule, self.money * 0.001)
+        # Bet = total x (0.004628 x true count + 0.009669) when count ≥ 1
+        bet = self.money * (0.005 * self.dealingMachine.getCounting() + 0.01)
+        handCard = HandCard(self.dealingMachine, self.rule, bet)
         handCard.initialAction(Role.PLAYER)
+        self.handCards = []
         self.handCards.append(handCard)
-    def playerAction(self):
+    def playerAction(self, dealer, agent=''):
         for handCard in self.handCards:
             while handCard.getAction():
-                self.printAction(handCard)
-                decision = raw_input("INPUT >>   ")
-                splitHandCard = handCard.action(Decision.MAP[int(decision)])
+                self.printAction(handCard, dealer.getHandCard())
+                if agent is '':
+                    decision = raw_input("INPUT >>> ")        # number 1~5
+                    decision = Decision.MAP[int(decision)]     # convert to Decision.HIT...
+                else:
+                    agentMethod = getattr(strategy, agent)
+                    decision = agentMethod(handCard, dealer.getHandCard())
+                    #decision = easyAction(handCard, dealer)
+                    print "INPUT >>>", decision
+                splitHandCard = handCard.action(decision)
                 if splitHandCard:
                     self.handCards.append(splitHandCard)
                 #self.action(handCard)
-    def action(self, handCard):
-        if Decision.SPLIT in handCard.getAction():
-            return Decision.SPLIT
-        if Decision.STAND in handCard.getAction() and handCard.getSumOfCards() > 16:
-            return Decision.STAND
-        if Decision.DOUBLE in handCard.getAction() and handCard.getSumOfCards() <= 11:
-            return Decision.DOUBLE
-        if Decision.HIT in handCard.getAction() and handCard.getSumOfCards() <= 16:
-            return Decision.HIT
         
     def betSettled(self, dealer):
         for handCard in self.handCards:
@@ -65,39 +67,28 @@ class Player:
                 if winlose is EndStep.LOSE:
                     earn += -1.0 * bet
             self.money += earn
-            self.printResult(handCard, dealer, earn)
+            self.printResult(handCard, dealer.getHandCard(), earn)
             
 
     def getMoney(self):
         return self.money
 
-    def printAction(self, handCard):
-        print "--------------------"
+    def printAction(self, handCard, dealerHandCard):
         print "1: Hit, 2: Stand, 3: Double, 4: Split, 5: Surrender"
-        print "Hand Card", handCard.getHandCard()
-        print "Sum Cards", handCard.getSumOfCards()
-        print "Action", handCard.getAction()
-        print "Money", self.money
-        print "Bet", handCard.getBetMoney()
+        print "Player      %2d %s" %(handCard.getSumOfCards(), handCard.getCards())
+        print "Dealer      %2d %s" %(dealerHandCard.getSumOfCards(), dealerHandCard.getCards())
+        print "Your Action", handCard.getAction()
+        print "Your Money ", self.money
+        print "Your Bet   ", handCard.getBetMoney()
         
-    def printResult(self, handCard, dealer, earn):
+    def printResult(self, handCard, dealerHandCard, earn):
         endStep = handCard.getEndStep()
-        winlose = handCard.getWinLose(dealer.getHandCard())
-        self.printHandCard(handCard)
-        print "Dealer Cards", dealer.getHandCard().getHandCard()
-        print "Dealer Sum  ", dealer.getHandCard().getSumOfCards()
-        print "EndStep", endStep
-        print "Result", winlose
-        print "Earn", earn
+        winlose = handCard.getWinLose(dealerHandCard)
+        print "Player      %2d %s" %(handCard.getSumOfCards(), handCard.getCards())
+        print "Dealer      %2d %s" %(dealerHandCard.getSumOfCards(), dealerHandCard.getCards())
+        print "EndStep    ", endStep, winlose
+        print "Earn       ", earn
         
-    def printHandCard(self, handCard):
-        print "Player Cards", handCard.getHandCard()
-        print "Player Sum  ", handCard.getSumOfCards()
-        #print "NumberOfCards", handCard.getNumberOfCards()
-        #print "NumberOfAces", handCard.getNumberOfAces()
-        #print "Action", handCard.getAction()
-        #print "BetMoney", handCard.getBetMoney()
-        #print "EndStep", handCard.getEndStep()
         
 class Dealer:
     def __init__(self, dm, rule):
@@ -131,51 +122,56 @@ class HandCard:
         self.endStep = EndStep.NEXT
         
     def initialAction(self, role):
+        """ Step: initial deal """
         self.role = role
         if role is Role.PLAYER:
-            self.draw()
-            self.draw()
+            self.__draw__()
+            self.__draw__()
         if role is Role.DEALER:
-            self.draw()
+            self.__draw__()
 
     def action(self, decision):
+        """ Step: player action """
         if decision not in self.getAction():
             raise Exception("decision not in getAcion().")
         if decision is Decision.HIT:
-            self.draw()
+            self.__draw__()
         if decision is Decision.STAND:
             self.endStep = EndStep.STAND
         if decision is Decision.SURRENDER:
             self.endStep = EndStep.SURRENDER
         if decision is Decision.DOUBLE:
-            self.draw()
+            self.__draw__()
             self.betMoney *= 2.0
             self.endStep = EndStep.STAND
         if decision is Decision.SPLIT:
-            card = self.pop()
-            self.draw()            
+            card = self.__pop__()
+            self.__draw__()            
 
             splitHandCard = HandCard(self.dealingMachine, self.rule, self.betMoney)
-            splitHandCard.give(card)
-            splitHandCard.draw()
+            splitHandCard.__give__(card)
+            splitHandCard.__draw__()
             return splitHandCard
             
             
-    def pop(self):
+    def __pop__(self):
         card = self.cards.pop()
         return card
 
-    def draw(self):
+    def __draw__(self):
         card = self.dealingMachine.getCard()
         self.cards.append(card)
         
-    def give(self, card):
+    def __give__(self, card):
         self.cards.append(card)
     
-    def getHandCard(self):
+    def getCards(self):
+        """ return an array with hand cards 
+            Ex. ['Card_5', 'Card_2'] """
         return self.cards
         
     def getSumOfCards(self):
+        """ return sum of hand cards """
         sumOfCards = 0        
         for card in self.cards:
             sumOfCards += Deck.VALUE[card]
@@ -185,15 +181,20 @@ class HandCard:
         return sumOfCards
         
     def getNumberOfCards(self):
+        """ return the number of cards in your hand card """
         return len(self.cards)
         
     def getNumberOfAces(self):
+        """ return the number of aces in your hand card """
         return self.cards.count(Deck.Card_A)
         
     def getBetMoney(self):
+        """ get you bet money in this round """
         return self.betMoney
         
     def getAction(self):
+        """ return actions Decision.HIT, Decision.STAND ......
+            Ex. ['Hit', 'Stand'] """
         nextStep = []
         if self.endStep in [EndStep.STAND, EndStep.SURRENDER]:
             return nextStep
@@ -201,26 +202,30 @@ class HandCard:
             nextStep.append(Decision.HIT)
         if self.getSumOfCards() <= 21 and self.getNumberOfCards() is not 0:
             nextStep.append(Decision.STAND)
-        if self.role is Role.PLAYER and self.getSumOfCards() < 21 and self.getNumberOfCards() is 2:
+        if self.getSumOfCards() < 21 and self.getNumberOfCards() is 2:
             nextStep.append(Decision.DOUBLE)
-        if self.role is Role.PLAYER and self.getSumOfCards() < 21 and self.cards and self.cards.count(self.cards[0]) is self.getNumberOfCards():
+        if self.getSumOfCards() < 21 and self.cards and self.cards.count(self.cards[0]) is self.getNumberOfCards():
             nextStep.append(Decision.SPLIT)
-        if self.role is Role.PLAYER and self.getSumOfCards() < 21 and self.getNumberOfCards() is not 0:
+        if self.getSumOfCards() < 21 and self.getNumberOfCards() is not 0:
             nextStep.append(Decision.SURRENDER)
         return nextStep
-        
+      
     def getEndStep(self):
+        """ check the end step is bust or blackjack """
         if self.getSumOfCards() > 21:
             self.endStep = EndStep.BUST
-        if self.getSumOfCards() is 21 and self.getNumberOfCards is 2:
+        if self.getSumOfCards() is 21 and self.getNumberOfCards() is 2:
             self.endStep = EndStep.BLACKJACK
-        return self.endStep
-        
-    def getWinLose(self, dealer):
+        return self.endStep      
+      
+    def getWinLose(self, dealerHandCard):
+        """ Step: Dealer's hand revealed
+            you get win or lose after compete with dealer. 
+            return: EndStep.LOST, EndStep.DRAW, EndStep.WIN """
         playerEndStep = self.getEndStep()
-        dealerEndStep = dealer.getEndStep()
+        dealerEndStep = dealerHandCard.getEndStep()
         playerSumCard = self.getSumOfCards()
-        dealerSumCard = dealer.getSumOfCards()
+        dealerSumCard = dealerHandCard.getSumOfCards()
         if playerEndStep in [EndStep.NEXT]:
             raise ValueError("getWinLose: HandCard.endStep does not in stand/bust/blackjack/surrender.")
         if playerEndStep in [EndStep.SURRENDER, EndStep.BUST]:
@@ -242,3 +247,4 @@ class HandCard:
                     return EndStep.DRAW
                 if playerSumCard < dealerSumCard:
                     return EndStep.LOSE
+

@@ -24,7 +24,7 @@ class Deck:
     Card_7 = "Card_7"
     Card_8 = "Card_8"
     Card_9 = "Card_9"
-    Card_10= "Card_10"
+    Card_T = "Card_10"
     Card_J = "Card_J"
     Card_Q = "Card_Q"
     Card_K = "Card_K"
@@ -38,7 +38,7 @@ class Deck:
             Card_7: 7,
             Card_8: 8,
             Card_9: 9,
-            Card_10: 10,
+            Card_T: 10,
             Card_J: 10,
             Card_Q: 10,
             Card_K: 10,
@@ -52,7 +52,7 @@ class Deck:
             Card_7: Card_7,
             Card_8: Card_8,
             Card_9: Card_9,
-            Card_10: Card_10,
+            Card_T: Card_T,
             Card_J: Card_J,
             Card_Q: Card_Q,
             Card_K: Card_K,
@@ -66,7 +66,7 @@ class Deck:
             Card_7:  0,
             Card_8:  0,
             Card_9:  0,
-            Card_10: -1,
+            Card_T: -1,
             Card_J: -1,
             Card_Q: -1,
             Card_K: -1,
