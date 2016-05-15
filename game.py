@@ -65,8 +65,6 @@ def main():
         else:
             strategy = ''
             
-    print " <><><>", strategy, gameround            
-            
     game = Game()
     game.gameInit()
     for i in range(gameround):
