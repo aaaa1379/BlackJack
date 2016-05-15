@@ -1,27 +1,33 @@
 # Play
-Compile `game.py` and Exec in console
 ```python
-g = Game()
-g.gameInit()
-g.gameRound()
+game.py -h             # see help
+game.py -r <round>     # game rounds
+```
+
+# Play with Strategy
+```python
+game.py -s <strategy>
+game.py -s easyAction
+game.py -r 3 -s easyAction
+game.py -r 3 -s basicStrategy
 ```
 
 # Schedule
 ## Completed
 1. shuffling Machine
 1. Card Counting
-
-## 4/18 completed
-1. Rules
 1. Player
   - Decisions
   - Bet
   - Insurance
 1. Dealer
-
-## --/--
 1. Basic Strategy
 1. Kelly Criterion
+
+## --/--
+1. Rules
+1. Player
+  - Insurance
 
 # Rules
 ## Number of Decks
