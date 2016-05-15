@@ -47,7 +47,7 @@ class Game:
 def main():
 
     strategy = ''
-    gameround = 3
+    gameround = 1
     try:
         argv = sys.argv[1:]
         opts, args = getopt.getopt(argv,"hs:r:",["strategy=", "gameround="])
