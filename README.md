@@ -24,7 +24,7 @@ game.py -r 3 -s basicStrategy
 1. Basic Strategy
 1. Kelly Criterion
 
-## --/--
+## Todo
 1. Rules
 1. Player
   - Insurance
